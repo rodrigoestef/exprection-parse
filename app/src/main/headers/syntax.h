@@ -54,7 +54,7 @@ private:
   }
 
   void step2() {
-    if (*this->buf < 48 || *this->buf > 57) {
+    if (*this->buf < '0' || *this->buf > '9') {
       throw Exception((char *)"token unexpected");
     }
     Token *newToken = new Token();
@@ -69,7 +69,7 @@ private:
 
     while (true) {
 
-      if (*this->buf < 48 || *this->buf > 57) {
+      if (*this->buf < '0' || *this->buf > '9') {
         this->step4(token);
         return;
       }
@@ -87,7 +87,7 @@ private:
     strcat(token->value, ".");
 
     this->buf++;
-    if (*this->buf < 48 || *this->buf > 57) {
+    if (*this->buf < '0' || *this->buf > '9') {
       throw Exception((char *)"expected one number alter dot");
     }
     char newChar[2] = {*this->buf, 0};
@@ -95,7 +95,7 @@ private:
     this->buf++;
 
     while (true) {
-      if (*this->buf < 47 || *this->buf > 57) {
+      if (*this->buf < '0' || *this->buf > '9') {
         return;
       }
       newChar[0] = *this->buf;
