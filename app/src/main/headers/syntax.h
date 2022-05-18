@@ -18,8 +18,9 @@ public:
 class Syntax {
 
 public:
-  Syntax(char *stream) {
-    this->buf = stream;
+  Syntax(FILE *stream) {
+    this->stream = stream;
+    this->lastChar = getc(this->stream);
     this->step0();
   }
   Token *getNextToken() { return this->queue->getNext(); }
@@ -27,12 +28,13 @@ public:
 private:
   void step0() {
     while (1) {
-      if (*this->buf == 0) {
+      if (this->lastChar == 0 || this->lastChar == EOF ||
+          this->lastChar == ';') {
         return;
       }
-      if (*this->buf == ' ' || *this->buf == '\n' || *this->buf == '\t' ||
-          *this->buf == '\r') {
-        this->buf++;
+      if (this->lastChar == ' ' || this->lastChar == '\n' ||
+          this->lastChar == '\t' || this->lastChar == '\r') {
+        this->lastChar = getc(this->stream);
         continue;
       }
       this->step1();
@@ -41,70 +43,71 @@ private:
 
   void step1() {
 
-    if (*this->buf == '+' || *this->buf == '-') {
+    if (this->lastChar == '+' || this->lastChar == '-') {
       Token *newToken = new Token();
       newToken->type = OPERATOR;
       newToken->value = (char *)calloc(2, sizeof(char));
-      *newToken->value = *this->buf;
+      *newToken->value = this->lastChar;
       this->queue->add(newToken);
-      this->buf++;
+      this->lastChar = getc(this->stream);
       return;
     }
     this->step2();
   }
 
   void step2() {
-    if (*this->buf < '0' || *this->buf > '9') {
+    if (this->lastChar < '0' || this->lastChar > '9') {
       throw Exception((char *)"token unexpected");
     }
     Token *newToken = new Token();
     newToken->value = (char *)calloc(255, sizeof(char));
-    *newToken->value = *this->buf;
+    *newToken->value = this->lastChar;
     newToken->type = NUMBER;
     this->queue->add(newToken);
-    this->buf++;
+    this->lastChar = getc(this->stream);
     this->step3(newToken);
   }
   void step3(Token *token) {
 
     while (true) {
 
-      if (*this->buf < '0' || *this->buf > '9') {
+      if (this->lastChar < '0' || this->lastChar > '9') {
         this->step4(token);
         return;
       }
 
-      char newChar[2] = {*this->buf, 0};
+      char newChar[2] = {this->lastChar, 0};
       strcat(token->value, newChar);
-      this->buf++;
+      this->lastChar = getc(this->stream);
     }
   }
 
   void step4(Token *token) {
-    if (*this->buf != '.') {
+    if (this->lastChar != '.') {
       return;
     }
     strcat(token->value, ".");
 
-    this->buf++;
-    if (*this->buf < '0' || *this->buf > '9') {
+    this->lastChar = getc(this->stream);
+    if (this->lastChar < '0' || this->lastChar > '9') {
       throw Exception((char *)"expected one number alter dot");
     }
-    char newChar[2] = {*this->buf, 0};
+    char newChar[2] = {this->lastChar, 0};
     strcat(token->value, newChar);
-    this->buf++;
+    this->lastChar = getc(this->stream);
 
     while (true) {
-      if (*this->buf < '0' || *this->buf > '9') {
+      if (this->lastChar < '0' || this->lastChar > '9') {
         return;
       }
-      newChar[0] = *this->buf;
+      newChar[0] = this->lastChar;
 
       strcat(token->value, newChar);
-      this->buf++;
+      this->lastChar = getc(this->stream);
     }
   }
-  char *buf;
+  char lastChar;
+  FILE *stream;
   Queue<Token *> *queue = new Queue<Token *>;
 };
 

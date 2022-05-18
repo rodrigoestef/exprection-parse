@@ -3,7 +3,7 @@
 #include <stdio.h>
 class Parser {
 public:
-  Parser(char *text) { this->syntax = new Syntax(text); }
+  Parser(FILE *stream) { this->syntax = new Syntax(stream); }
 
   float parse() { return this->expr(); }
 

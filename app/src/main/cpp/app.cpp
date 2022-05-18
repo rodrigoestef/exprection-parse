@@ -6,23 +6,28 @@
 #include <stdio.h>
 #include <string.h>
 
-int main() {
-  char c[255];
+int main(int argc, char *argv[]) {
+
+  FILE *stream = stdin;
+  if (argc > 1) {
+    char *filepath = argv[1];
+    stream = fopen(filepath, "r");
+
+    if (stream == 0) {
+      printf("does not possible open file %s\n", filepath);
+      return 0;
+    }
+  }
   float f;
+
   Parser *parser;
-  while (true) {
-    printf("lisp> ");
-    fgets(c, 255, stdin);
-    if (strcmp(c, "exit\n") == 0) {
-      break;
-    }
-    try {
-      parser = new Parser(c);
-      f = parser->parse();
-      printf("%f\n", f);
-    } catch (Exception &e) {
-      printf("ERROR: %s\n", e.message);
-    }
+  printf("lisp> ");
+  try {
+    parser = new Parser(stream);
+    f = parser->parse();
+    printf("%f\n", f);
+  } catch (Exception &e) {
+    printf("ERROR: %s\n", e.message);
   }
   return 0;
 }
