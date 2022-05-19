@@ -11,7 +11,7 @@ void testSyntax() {
 
   stream = open_memstream(&buffer, &size);
 
-  fprintf(stream, "+ 9 3 50 2.2");
+  fprintf(stream, "+ 9 () 3 50 2.2");
   fflush(stream);
 
   Syntax *syntax = new Syntax(stream);
@@ -22,6 +22,10 @@ void testSyntax() {
   assert(token->type == OPERATOR);
   token = syntax->getNextToken();
   assert(token->type == NUMBER);
+  token = syntax->getNextToken();
+  assert(token->type == OP);
+  token = syntax->getNextToken();
+  assert(token->type == CP);
   token = syntax->getNextToken();
   assert(token->type == NUMBER);
 

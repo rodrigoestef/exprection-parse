@@ -10,17 +10,22 @@ public:
 private:
   float expr() {
     Token *token = this->syntax->getNextToken();
-    if (token == 0 || token->type != NUMBER) {
-      throw Exception((char *)"NUMBER expected");
+    if (token == 0 || !(token->type == NUMBER || token->type == OP)) {
+      throw Exception((char *)"NUMBER or '(' expected");
     }
-    float num;
+    if (token->type == NUMBER) {
 
-    sscanf(token->value, "%f", &num);
-    return num + this->exprl();
+      float num;
+
+      sscanf(token->value, "%f", &num);
+      return num + this->exprl();
+    } else {
+      return this->expr() + this->exprl();
+    }
   }
   float exprl() {
     Token *token = this->syntax->getNextToken();
-    if (token == 0) {
+    if (token == 0 || token->type == CP) {
       return 0;
     }
     if (token->type != OPERATOR) {
@@ -28,17 +33,25 @@ private:
     }
     char oper = *token->value;
     token = this->syntax->getNextToken();
-    if (token == 0 || token->type != NUMBER) {
-      throw Exception((char *)"NUMBER expected");
+    if (token == 0 || !(token->type == NUMBER || token->type == OP)) {
+      throw Exception((char *)"NUMBER or '(' expected");
     }
+    if (token->type == NUMBER) {
 
-    float num;
-    sscanf(token->value, "%f", &num);
+      float num;
+      sscanf(token->value, "%f", &num);
 
-    if (oper == '-') {
-      num = num * (-1);
+      if (oper == '-') {
+        num = num * (-1);
+      }
+      return num + this->exprl();
+    } else {
+      float exprResult = this->expr();
+      if (oper == '-') {
+        exprResult = exprResult * (-1);
+      }
+      return exprResult + this->exprl();
     }
-    return num + this->exprl();
   }
   Syntax *syntax;
 };

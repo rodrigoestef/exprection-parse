@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum TokensType { NUMBER, OPERATOR };
+enum TokensType { NUMBER, OPERATOR, OP, CP };
 
 class Token {
 public:
@@ -52,6 +52,24 @@ private:
       this->lastChar = getc(this->stream);
       return;
     }
+
+    if (this->lastChar == '(' || this->lastChar == ')') {
+      Token *newToken = new Token();
+      newToken->value = (char *)calloc(2, sizeof(char));
+      *newToken->value = this->lastChar;
+      this->queue->add(newToken);
+
+      if (this->lastChar == '(') {
+        newToken->type = OP;
+      }
+
+      if (this->lastChar == ')') {
+        newToken->type = CP;
+      }
+      this->lastChar = getc(this->stream);
+      return;
+    }
+
     this->step2();
   }
 
