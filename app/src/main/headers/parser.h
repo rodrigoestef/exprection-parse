@@ -16,12 +16,47 @@ private:
       throw Exception((char *)"NUMBER or '(' expected");
     }
     if (token->type == NUMBER) {
+      this->currentQueue->add(token);
+      float num = this->exprm();
+
+      float num2 = this->exprl();
+      num = std::isnan(num2) ? num : num + num2;
+      return num;
+    } else {
+
+      float num = this->expr();
+      token = this->getNextToken();
+      if (token == 0 || token->type != CP) {
+        throw Exception((char *)") expected");
+      }
+
+      token = this->getNextToken();
+      this->currentQueue->add(token);
+
+      if (token == 0) {
+        return num;
+      }
+      if (token->type == OPERATOR) {
+        return num + this->exprl();
+      } else if (token->type == OPERATOR) {
+        return num * this->exprml();
+      } else {
+        throw Exception((char *)"OPERATOR expected");
+      }
+    }
+  }
+  float exprm() {
+    Token *token = this->getNextToken();
+    if (token == 0 || !(token->type == NUMBER || token->type == OP)) {
+      throw Exception((char *)"NUMBER or '(' expected");
+    }
+    if (token->type == NUMBER) {
 
       float num;
 
       sscanf(token->value, "%f", &num);
-      float num2 = this->exprl();
-      num = std::isnan(num2) ? num : num + num2;
+      float num2 = this->exprml();
+      num = std::isnan(num2) ? num : num * num2;
       return num;
     } else {
       float num = this->expr();
@@ -29,9 +64,80 @@ private:
       if (token == 0 || token->type != CP) {
         throw Exception((char *)") expected");
       }
-      float num2 = this->exprl();
-      num = std::isnan(num2) ? num : num + num2;
+
+      token = this->getNextToken();
+      this->currentQueue->add(token);
+
+      if (token == 0) {
+        return num;
+      }
+      if (token->type == OPERATOR) {
+        return num + exprl();
+      } else if (token->type == OPERATORM) {
+        return num * exprml();
+      } else {
+        throw Exception((char *)"OPERATOR expected");
+      }
+    }
+  }
+  float exprml() {
+    Token *token = this->getNextToken();
+    if (token == 0) {
+
+      return NAN;
+    }
+    if (token->type == CP) {
+      this->currentQueue->add(token);
+      return NAN;
+    }
+    if (token->type != OPERATORM) {
+      this->currentQueue->add(token);
+      return NAN;
+    }
+    char oper = *token->value;
+    token = this->getNextToken();
+    if (token == 0 || !(token->type == NUMBER || token->type == OP)) {
+      throw Exception((char *)"NUMBER or '(' expected");
+    }
+    if (token->type == NUMBER) {
+
+      float num;
+      sscanf(token->value, "%f", &num);
+
+      if (oper == '/') {
+        num = 1 / num;
+      }
+      float num2 = this->exprml();
+      num = std::isnan(num2) ? num : num * num2;
       return num;
+    } else {
+      float exprResult = this->expr();
+
+      token = this->getNextToken();
+
+      if (token == 0 || token->type != CP) {
+        throw Exception((char *)") expected");
+      }
+
+      if (oper == '/') {
+        exprResult = 1 / exprResult;
+      }
+
+      token = this->getNextToken();
+      this->currentQueue->add(token);
+
+      if (token == 0) {
+        return exprResult;
+      }
+      if (token->type == OPERATOR) {
+
+        return exprResult + this->exprl();
+      } else if (token->type == OPERATORM) {
+
+        return exprResult * this->exprml();
+      } else {
+        throw Exception((char *)"OPERATOR expected");
+      }
     }
   }
   float exprl() {
@@ -54,8 +160,9 @@ private:
     }
     if (token->type == NUMBER) {
 
-      float num;
-      sscanf(token->value, "%f", &num);
+      this->currentQueue->add(token);
+
+      float num = this->exprm();
 
       if (oper == '-') {
         num = num * (-1);
@@ -71,13 +178,25 @@ private:
       if (token == 0 || token->type != CP) {
         throw Exception((char *)") expected");
       }
-
       if (oper == '-') {
         exprResult = exprResult * (-1);
       }
-      float num2 = this->exprl();
-      exprResult = std::isnan(num2) ? exprResult : exprResult + num2;
-      return exprResult;
+
+      token = this->getNextToken();
+      this->currentQueue->add(token);
+
+      if (token == 0) {
+        return exprResult;
+      }
+      if (token->type == OPERATOR) {
+
+        return exprResult + this->exprl();
+      } else if (token->type == OPERATORM) {
+
+        return exprResult * this->exprml();
+      } else {
+        throw Exception((char *)"OPERATOR expected");
+      }
     }
   }
 
