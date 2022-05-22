@@ -1,5 +1,7 @@
 #include "exceptions.h"
+#include "queue.h"
 #include "syntax.h"
+#include <cmath>
 #include <stdio.h>
 class Parser {
 public:
@@ -9,7 +11,7 @@ public:
 
 private:
   float expr() {
-    Token *token = this->syntax->getNextToken();
+    Token *token = this->getNextToken();
     if (token == 0 || !(token->type == NUMBER || token->type == OP)) {
       throw Exception((char *)"NUMBER or '(' expected");
     }
@@ -18,21 +20,35 @@ private:
       float num;
 
       sscanf(token->value, "%f", &num);
-      return num + this->exprl();
+      float num2 = this->exprl();
+      num = std::isnan(num2) ? num : num + num2;
+      return num;
     } else {
-      return this->expr() + this->exprl();
+      float num = this->expr();
+      token = this->getNextToken();
+      if (token == 0 || token->type != CP) {
+        throw Exception((char *)") expected");
+      }
+      float num2 = this->exprl();
+      num = std::isnan(num2) ? num : num + num2;
+      return num;
     }
   }
   float exprl() {
-    Token *token = this->syntax->getNextToken();
-    if (token == 0 || token->type == CP) {
-      return 0;
+    Token *token = this->getNextToken();
+    if (token == 0) {
+
+      return NAN;
+    }
+    if (token->type == CP) {
+      this->currentQueue->add(token);
+      return NAN;
     }
     if (token->type != OPERATOR) {
       throw Exception((char *)"OPERATOR expected");
     }
     char oper = *token->value;
-    token = this->syntax->getNextToken();
+    token = this->getNextToken();
     if (token == 0 || !(token->type == NUMBER || token->type == OP)) {
       throw Exception((char *)"NUMBER or '(' expected");
     }
@@ -44,14 +60,35 @@ private:
       if (oper == '-') {
         num = num * (-1);
       }
-      return num + this->exprl();
+      float num2 = this->exprl();
+      num = std::isnan(num2) ? num : num + num2;
+      return num;
     } else {
       float exprResult = this->expr();
+
+      token = this->getNextToken();
+
+      if (token == 0 || token->type != CP) {
+        throw Exception((char *)") expected");
+      }
+
       if (oper == '-') {
         exprResult = exprResult * (-1);
       }
-      return exprResult + this->exprl();
+      float num2 = this->exprl();
+      exprResult = std::isnan(num2) ? exprResult : exprResult + num2;
+      return exprResult;
     }
   }
+
+  Token *getNextToken() {
+    Token *token = this->currentQueue->getNext();
+    if (token != 0) {
+      return token;
+    } else {
+      return this->syntax->getNextToken();
+    }
+  }
+  Queue<Token *> *currentQueue = new Queue<Token *>();
   Syntax *syntax;
 };
