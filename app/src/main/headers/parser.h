@@ -38,7 +38,7 @@ private:
       }
       if (token->type == OPERATOR) {
         return num + this->exprl();
-      } else if (token->type == OPERATOR) {
+      } else if (token->type == OPERATORM) {
         return num * this->exprml();
       } else {
         throw Exception((char *)"OPERATOR expected");
@@ -131,7 +131,7 @@ private:
       }
       if (token->type == OPERATOR) {
 
-        return exprResult + this->exprl();
+        return exprResult;
       } else if (token->type == OPERATORM) {
 
         return exprResult * this->exprml();
