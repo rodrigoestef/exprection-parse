@@ -40,6 +40,8 @@ private:
         return num + this->exprl();
       } else if (token->type == OPERATORM) {
         return num * this->exprml();
+      } else if (token->type == CP) {
+        return num;
       } else {
         throw Exception((char *)"OPERATOR expected");
       }
@@ -75,6 +77,8 @@ private:
         return num + exprl();
       } else if (token->type == OPERATORM) {
         return num * exprml();
+      } else if (token->type == CP) {
+        return num;
       } else {
         throw Exception((char *)"OPERATOR expected");
       }
@@ -135,6 +139,8 @@ private:
       } else if (token->type == OPERATORM) {
 
         return exprResult * this->exprml();
+      } else if (token->type == CP) {
+        return exprResult;
       } else {
         throw Exception((char *)"OPERATOR expected");
       }
@@ -194,6 +200,8 @@ private:
       } else if (token->type == OPERATORM) {
 
         return exprResult * this->exprml();
+      } else if (token->type == CP) {
+        return exprResult;
       } else {
         throw Exception((char *)"OPERATOR expected");
       }

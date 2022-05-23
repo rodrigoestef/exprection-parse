@@ -87,4 +87,12 @@ void testParser() {
   parser = new Parser(stream);
   fclose(stream);
   assert(parser->parse() == 2.5);
+
+  stream = open_memstream(&buffer, &t);
+
+  fprintf(stream, "(2-1)*(2*(2+2))");
+  fflush(stream);
+  parser = new Parser(stream);
+  fclose(stream);
+  assert(parser->parse() == 8);
 }
