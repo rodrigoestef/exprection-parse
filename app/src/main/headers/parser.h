@@ -39,7 +39,10 @@ private:
       if (token->type == OPERATOR) {
         return num + this->exprl();
       } else if (token->type == OPERATORM) {
-        return num * this->exprml();
+        num = num * this->exprml();
+        float num2 = this->exprl();
+        num = std::isnan(num2) ? num : num + num2;
+        return num;
       } else if (token->type == CP) {
         return num;
       } else {
@@ -199,7 +202,10 @@ private:
         return exprResult + this->exprl();
       } else if (token->type == OPERATORM) {
 
-        return exprResult * this->exprml();
+        exprResult = exprResult * this->exprml();
+        float num2 = this->exprl();
+        exprResult = std::isnan(num2) ? exprResult : exprResult + num2;
+        return exprResult;
       } else if (token->type == CP) {
         return exprResult;
       } else {
