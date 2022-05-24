@@ -1,0 +1,17 @@
+EXPER: EXPERM EXPER' | op EXPER cp ( EXPER' | EXPERM' EXPER' | &) ;
+
+EXPER': operator (EXPERM EXPER' | op EXPER cp (EXPER' | EXPERM' EXPER' | & ) ) | & ;
+
+EXPERM: number EXPERM' | op EXPER cp (EXPER' | EXPERM' | &)
+
+EXPERM': operatorm number EXPERM' | op EXPER cp ( EXPERM' | & ) )  | &
+
+op: '(';
+
+cp: ')';
+
+operator: '+' | '-' ;
+
+operatorm: '*' | '/' ;
+
+number: [0-9]+('.' [0-9]+)?;
