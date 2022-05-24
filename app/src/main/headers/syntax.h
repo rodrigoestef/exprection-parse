@@ -28,6 +28,14 @@ public:
 private:
   void step0() {
     while (1) {
+      if (this->lastChar == '#') {
+        while (1) {
+          this->lastChar = getc(this->stream);
+          if (this->lastChar == '\n') {
+            break;
+          }
+        }
+      }
       if (this->lastChar == 0 || this->lastChar == EOF ||
           this->lastChar == ';') {
         return;
