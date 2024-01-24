@@ -8,6 +8,7 @@ class QueueNode {
 public:
   T value;
   QueueNode<T> *nextNode;
+  QueueNode() { this->nextNode = 0; }
 };
 
 template <typename T>
@@ -16,12 +17,16 @@ class Queue {
 public:
   T getNext() {
 
-    if (this->queue == 0) {
+    if (this->first == 0) {
       return 0;
     }
-    T value = this->queue->value;
+    T value = this->first->value;
 
-    this->queue = this->queue->nextNode;
+    this->first = this->first->nextNode;
+
+    if (this->first == 0) {
+      this->last = 0;
+    }
 
     return value;
   }
@@ -31,26 +36,21 @@ public:
     QueueNode<T> *newItem = new QueueNode<T>;
 
     newItem->value = value;
-    newItem->nextNode = 0;
 
-    if (this->queue == 0) {
-      this->queue = newItem;
+    if (this->last == 0) {
+      this->first = newItem;
+      this->last = newItem;
       return;
     }
 
-    QueueNode<T> *node = this->queue;
-    while (true) {
+    this->last->nextNode = newItem;
 
-      if (node->nextNode == 0) {
-        node->nextNode = newItem;
-        return;
-      }
-      node = node->nextNode;
-    }
+    this->last = newItem;
   }
 
 private:
-  QueueNode<T> *queue = 0;
+  QueueNode<T> *first = 0;
+  QueueNode<T> *last = 0;
 };
 
 #endif // !QUEUE_H
